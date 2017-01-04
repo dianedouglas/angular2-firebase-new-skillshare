@@ -30,9 +30,14 @@
     };
     firebase.initializeApp(config);
 
-    var root = firebase.database().ref();
+    var root = firebase.database().ref('users');
     root.on('value', function(snap){
-      console.log(snap.val());
+      var users = snap.val();
+      var key = snap.key;
+      // console.log(users[0].name);
+      users.forEach(function(user){
+        console.log(user.name);
+      })
     })
   </script>
 
