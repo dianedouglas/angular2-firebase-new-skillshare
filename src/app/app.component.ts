@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { initializeApp, database } from 'firebase';
+import { firebaseConfig } from '../environments/firebase.config';
+import { AngularFire, FirebaseListObservable, FirebaseObjectObservable  } from "angularfire2";
+
 
 @Component({
   selector: 'app-root',
@@ -8,25 +11,12 @@ import { initializeApp, database } from 'firebase';
 })
 export class AppComponent {
   title = 'app works!';
-  constructor() {
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyAwuKl7qjXwEFV4e_XdCLY8goNChIMgc1w",
-      authDomain: "tutorial-b967f.firebaseapp.com",
-      databaseURL: "https://tutorial-b967f.firebaseio.com",
-      storageBucket: "tutorial-b967f.appspot.com",
-      messagingSenderId: "979501840072"
-    };
-    initializeApp(config);
+  constructor(private af: AngularFire) {
+    // $ means it is an observable
+    const courses$ : FirebaseListObservable<any> =  af.database.list('courses');
+    courses$.subscribe(
+      val => console.log(val)
+    );
 
-    var root = database().ref('users');
-    root.on('value', function(snap){
-      var users = snap.val();
-      var key = snap.key;
-      // console.log(users[0].name);
-      users.forEach(function(user){
-        console.log(user.name);
-      })
-    })
   }
 }
