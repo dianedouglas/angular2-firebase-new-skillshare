@@ -13,9 +13,28 @@
     <link rel="stylesheet"
           href="https://angular-academy.s3-us-west-1.amazonaws.com/styles/angular-academy-lessons-theme-v1.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  
+
 </head>
 <body>
   <app-root>Loading...</app-root>
+
+  <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAwuKl7qjXwEFV4e_XdCLY8goNChIMgc1w",
+      authDomain: "tutorial-b967f.firebaseapp.com",
+      databaseURL: "https://tutorial-b967f.firebaseio.com",
+      storageBucket: "tutorial-b967f.appspot.com",
+      messagingSenderId: "979501840072"
+    };
+    firebase.initializeApp(config);
+
+    var root = firebase.database().ref();
+    root.on('value', function(snap){
+      console.log(snap.val());
+    })
+  </script>
+
 </body>
 </html>
