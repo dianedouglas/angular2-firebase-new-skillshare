@@ -46,9 +46,12 @@ export class AppComponent {
     this.courses$.update(this.firstCourse, {name: "advanced wizardry"});
   }
   objUpdate() {
-
+    this.lesson$.update({description: 'Very strange'});
   }
   objSet() {
-
+    this.lesson$.set({description: 'makes you smarter'});
+  }
+  objRemove() {
+    this.lesson$.remove();
   }
 }
