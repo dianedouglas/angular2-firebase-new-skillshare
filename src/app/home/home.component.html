@@ -2,5 +2,5 @@
 <h4>Total Lessons: {{lessonsProperty?.length}}</h4>
 
 <ul>
-  <li *ngFor="let lesson of lessonsProperty">{{lesson.description}}</li>
+  <lessons-list [lessons]=lessonsProperty></lessons-list>
 </ul>

@@ -10,12 +10,14 @@ import {LessonsService} from "./shared/model/lessons.service";
 import {Lesson} from './shared/model/lesson';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
+import { LessonsListComponent } from './lessons-list/lessons-list.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    LessonsListComponent
   ],
   imports: [
     BrowserModule,
