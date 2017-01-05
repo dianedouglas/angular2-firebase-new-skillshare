@@ -43,7 +43,7 @@ export class AppComponent {
     this.courses$.remove(this.firstCourse);
   }
   listUpdate() {
-
+    this.courses$.update(this.firstCourse, {name: "advanced wizardry"});
   }
   objUpdate() {
 
