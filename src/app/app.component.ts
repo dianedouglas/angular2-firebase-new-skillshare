@@ -11,16 +11,36 @@ import { AngularFire, FirebaseListObservable, FirebaseObjectObservable  } from "
 })
 export class AppComponent {
   title = 'app works!';
+  courses$: FirebaseListObservable<any>;
+  lesson$: FirebaseObjectObservable<any>;
   constructor(private af: AngularFire) {
     // $ means it is an observable
-    const courses$ : FirebaseListObservable<any> =  af.database.list('courses');
-    courses$.subscribe(
+    this.courses$ = af.database.list('courses');
+    this.lesson$ = af.database.object('lessons/-K_fUAmEmMdo2RQUCLWt');
+    this.courses$.subscribe(
       val => console.log(val)
     );
-
-    const course$ : FirebaseObjectObservable<any> = af.database.object('courses/-K_fUAmBdZLQRnQWPmQM')
-    course$.subscribe(
+    this.lesson$.subscribe(
       val => console.log(val)
     )
+  }
+  listPush() {
+    this.courses$.push({name: 'Wizardry'})
+      .then(
+        () => console.log('List Push Done'),
+        () => console.log('There was an error.')
+      );
+  }
+  listRemove() {
+
+  }
+  listUpdate() {
+
+  }
+  objUpdate() {
+
+  }
+  objSet() {
+
   }
 }
