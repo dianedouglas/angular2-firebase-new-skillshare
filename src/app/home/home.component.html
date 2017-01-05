@@ -1,3 +1,6 @@
-<p>
-  home works!
-</p>
+<h2>All Lessons</h2>
+<h4>Total Lessons: {{lessonsProperty?.length}}</h4>
+
+<ul>
+  <li *ngFor="let lesson of lessonsProperty">{{lesson.description}}</li>
+</ul>

@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { initializeApp, database } from 'firebase';
 import { firebaseConfig } from '../environments/firebase.config';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable  } from "angularfire2";
-import 'rxjs/add/operator/map';
-
 
 @Component({
   selector: 'app-root',
