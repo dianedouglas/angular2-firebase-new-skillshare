@@ -9,7 +9,23 @@ export class Lesson {
     public longDescription: string,
     public courseId: string
   ) {
+  }
+
+  static fromJsonList(arrayOfLessonObservables):Lesson[] {
+    return arrayOfLessonObservables.map(inputJsonSingleLesson =>
+      Lesson.fromJson(inputJsonSingleLesson));
 
   }
 
+  static fromJson({
+      $key,
+      description,
+      duration,
+      url,
+      tags,
+      videoUrl,
+      longDescription,
+      courseId}):Lesson {
+    return new Lesson($key, description, duration, url, tags, videoUrl, longDescription, courseId);
+  }
 }
