@@ -305,13 +305,12 @@ Only properties are allowed in the model. What you get back from the findAllLess
 */
 
 // inside our service
-findAllLessons(): Observable<Lessons[]> {
-  return af.database.list('lessons')
+findAllLessons(): Observable<Lesson[]> {
+
+  return this.af.database.list('lessons')
     .do(console.log)
-    .map(Lesson.fromJsonList);
-    // do prints.
-    // map runs a function for each thing in the array you call it on.
-    // we are running a static function from our Lesson model class.
+    .map(lessonsAsJson => Lesson.fromJsonList(lessonsAsJson));
+
 }
 
 // In the Lesson model class lesson.ts
@@ -322,12 +321,22 @@ findAllLessons(): Observable<Lessons[]> {
 class Lesson {
   constructor(){}
 
-  static function fromJsonList(arrayOfLessonObservables):Lesson[] {
-    return arrayOfLessonObservables.map(inputJsonSingleLesson => Lesson.fromJson(inputJsonSingleLesson));
+  static fromJsonList(arrayOfLessonObservables):Lesson[] {
+    return arrayOfLessonObservables.map(inputJsonSingleLesson =>
+      Lesson.fromJson(inputJsonSingleLesson));
+
   }
 
-  static function fromJson({property1, property2}):Lesson {
-    return new Lesson(property1, property2);
+  static fromJson({
+      $key,
+      description,
+      duration,
+      url,
+      tags,
+      videoUrl,
+      longDescription,
+      courseId}):Lesson {
+    return new Lesson($key, description, duration, url, tags, videoUrl, longDescription, courseId);
   }
 }
 
@@ -339,9 +348,9 @@ We are passing that array of lessons in as a regular input parameter.
 
 in the home template:
 
-<lessons-list [lessons]="lessons"></lessons-list>
+<lessons-list [lessons]="lessonsProperty"></lessons-list>
 
-Then we want to rename 'lessons' property in the home component to 'allLessons' and adds a new one called 'filtered'.
+Then we want to rename 'lessonsProperty' property in the home component to 'allLessons' and adds a new one called 'filtered'.
 This will hold the lessons that match the search term.
 We will also now pass in the 'filtered' property to the lessons-list component to only display those.
 
@@ -369,3 +378,199 @@ Then define the search method.
 search(userInput) {
   this.filtered = this.allLessons.filter( currentLesson => currentLesson.description.includes(userInput));
 }
+
+22. Setting Up the Router Configuration of our Application
+
+Router module
+
+router.config.ts in /src/app
+
+
+import {Route} from '@angular/router';
+import {HomeComponent} from './home/home.component';
+// import all components you are routing to
+
+export const routerConfig : Route[] = [
+  {
+    path: 'home',
+    component: HomeComponent
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'home'
+  }
+];
+export an array of Route objects tying a path to a component
+_____
+
+then in the app component we need to put the <router-outlet> directive in the template.
+_____
+then add RouterModule to imports array in app.module.ts:
+
+import {RouterModule} from '@angular/router';
+import {routerConfig} from './router.config';
+
+imports: [
+  BrowserModule,
+  AngularFireModule.initializeApp(firebaseConfig),
+  FormsModule,
+  HttpModule,
+  RouterModule.forRoot(routerConfig)
+],
+
+23. Building a Navigation Menu Using The Angular 2 Router
+
+ng g component top-menu
+
+this component holds links to other components
+you can use the generated .css file to affect only the current component
+
+also creates 'courses' component
+ng g component courses
+
+add route to new component in router  with import component statement.
+
+then make router link:
+<a routerLinkActive="menu-active" routerLink="path" [routerLinkActiveOptions]="{exact:true}">TEXT</a>
+[routerLinkActiveOptions]="{exact:true}" is used when your link is a blank string
+
+24.Setting Up the Master Screen of the Master Detail Pattern
+_______
+generate courses service:
+ng g service shared/model/courses
+add service to the providers array in app.module.ts
+________
+setting up courses component:
+then in the courses.component.ts
+inject service in the constructor, made the courses$ property to hold the observable array of courses.
+Then we added a call to the service's 'findAllCourses' method which we are about to define.
+
+import { Component, OnInit } from '@angular/core';
+import { CoursesService } from '../shared/model/courses.service';
+import { Observable } from 'rxjs/Rx';
+import { Course } from '../shared/model/course.ts';
+
+@Component({
+  selector: 'app-courses',
+  templateUrl: './courses.component.html',
+  styleUrls: ['./courses.component.css']
+})
+export class CoursesComponent implements OnInit {
+  courses$: Observable<Course[]>;
+
+  constructor(private coursesService: CoursesService) { }
+
+  ngOnInit() {
+    this.courses$ = this.coursesService.findAllCourses();
+  }
+
+}
+__________
+then make course model shared/model/course.ts
+structure looks like this:
+export class Course {
+  constructor(properties)
+  static fromJson
+  static fromJsonList
+}
+
+actual file:
+export class Course {
+  constructor(
+    public $key: string,
+    public url: string,
+    public description: string,
+    public iconUrl: string,
+    public courseListIcon: string,
+    public longDescription: string) {
+
+  }
+
+
+  static fromJsonList(json) : Course[] {
+    return json.map(Course.fromJson);
+  }
+
+  static fromJson({$key, url, description, iconUrl, courseListIcon, longDescription}):Course {
+    return new Course($key, url, description, iconUrl, courseListIcon, longDescription);
+  }
+
+}
+
+__________
+
+Then, in the courses.component.html
+we can loop through courses$ observable by using async pipe
+
+<p *ngFor="let course of (courses$ | async)">
+  {{course.description}}
+</p>
+_________
+
+then in the courses service we have to define the findAllCourses method and inside of it, we call the static fromJsonList method in our course model.
+
+
+import { Injectable } from '@angular/core';
+import {AngularFire} from 'angularfire2';
+import {Observable} from 'rxjs/Rx';
+import {Course} from './course';
+
+@Injectable()
+export class CoursesService {
+
+  constructor(private af: AngularFire) { }
+
+  findAllCourses(): Observable<Course[]> {
+    return this.af.database.list('courses').map(Course.fromJsonList);
+  }
+}
+25. Configuring the Angular 2 Router for Master To Detail Navigation
+__________
+
+create course detail component
+ng g component course-detail
+
+then add route to router.config.ts
+instead of this:
+
+{
+  path: 'courses',
+  component: CoursesComponent
+},
+
+we want this:
+
+import {CoursesComponent} from './courses/courses.component';
+import {CourseDetailComponent} from './course-detail/courses-detail.component';
+
+{
+  path: 'courses',
+  children: [
+    {
+      path: ':id',
+      component: CourseDetailComponent
+    },
+    {
+      path: '',
+      component: CoursesComponent
+    }
+  ]
+},
+*** remember to restart server after adding a new file with ng generate.
+
+_______
+
+Then in the courses.component.html file we want to create links to navigate to each course detail
+
+<button [routerLink]="course.url">View</button>
+don't forget square brackets in this case around routerLink.
+
+This navigates to the relative url of the current page which would be /courses.
+this would go to courses/whatever-is-in-that-url-property
+
+26.

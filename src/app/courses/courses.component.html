@@ -1,3 +1,4 @@
 <p *ngFor="let course of (courses$ | async)">
   {{course.description}}
+  <button [routerLink]="course.url">View</button>
 </p>
