@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { CoursesService } from '../shared/model/courses.service';
+import { Observable } from 'rxjs/Rx';
+import { Course } from '../shared/model/course.ts';
 
 @Component({
   selector: 'app-courses',
@@ -6,10 +9,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
+  courses$: Observable<Course[]>;
 
-  constructor() { }
+  constructor(private coursesService: CoursesService) { }
 
   ngOnInit() {
+    this.courses$ = this.coursesService.findAllCourses();
   }
 
 }

@@ -15,6 +15,7 @@ import {RouterModule} from '@angular/router';
 import {routerConfig} from './router.config';
 import { TopMenuComponent } from './top-menu/top-menu.component';
 import { CoursesComponent } from './courses/courses.component';
+import { CoursesService } from './shared/model/courses.service'
 
 @NgModule({
   declarations: [
@@ -31,7 +32,7 @@ import { CoursesComponent } from './courses/courses.component';
     HttpModule,
     RouterModule.forRoot(routerConfig)
   ],
-  providers: [LessonsService],
+  providers: [LessonsService, CoursesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
