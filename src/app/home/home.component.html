@@ -1,6 +1,8 @@
+<input (keyup)=search(typedInput.value) #typedInput>
+
 <h2>All Lessons</h2>
 <h4>Total Lessons: {{lessonsProperty?.length}}</h4>
 
 <ul>
-  <lessons-list [lessons]=lessonsProperty></lessons-list>
+  <lessons-list [lessons]=filtered></lessons-list>
 </ul>
