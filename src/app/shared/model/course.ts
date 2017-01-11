@@ -12,12 +12,12 @@ export class Course {
   }
 
 
-static fromJsonList(json) : Course[] {
-  return json.map(Course.fromJson);
-}
+  static fromJsonList(json) : Course[] {
+    return json.map(Course.fromJson);
+  }
 
-static fromJson({$key, url, description, iconUrl, courseListIcon, longDescription}):Course {
-  return new Course($key, url, description, iconUrl, courseListIcon, longDescription);
-}
+  static fromJson({$key, url, description, iconUrl, courseListIcon, longDescription}):Course {
+    return new Course($key, url, description, iconUrl, courseListIcon, longDescription);
+  }
 
 }
