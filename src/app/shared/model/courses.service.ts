@@ -25,23 +25,24 @@ export class CoursesService {
 
   findLessonsForCourse(courseUrl: string): Observable<Lesson[]>{
     console.log(courseUrl);
-
-    // query courses based on url.
+    // get course observable we have navigated to by url.
     const course$ = this.findCourseByUrl(courseUrl);
 
+    // go to the lessonsPerCourse table(node)
+    // inside of there, find the course table by $key output lessons.
+    // get back gross firebase object observable array.
     const lessonsPerCourse$ = course$
       .switchMap(course => this.db.list('lessonsPerCourse/' + course.$key))
       .do(console.log);
 
-    lessonsPerCourse$.subscribe();
-    // add a new rule for courses node.
-    /*
-    as part of the rules object, after read/write add courses:
-    "courses" {
-      ".indexOn" : ["url"]
-    }
-    */
-
-    return Observable.of([]);
+      // talking to the reference we got back from lessonsPerCourse above
+      // for each firebaseObjectObservable in that array we call db.object to get back the observable for the lesson from the lessons table
+      // this is at the address lessons/lessonkey
+      // THEN we call flatmap on that and somehow that gives us an array of useable lesson objects.
+    return lessonsPerCourse$
+      .map(lessonsPerCourseParameter => lessonsPerCourseParameter.map(lesson => this.db.object('lessons/' + lesson.$key)) )
+      .flatMap(fbojs => Observable.combineLatest(fbojs) )
+      .do(console.log);
   }
+
 }

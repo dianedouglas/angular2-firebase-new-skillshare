@@ -1,19 +1,10 @@
+<h2>{{ (course$ | async)?.description }}</h2>
 <div class="nav-bar">
   <button>Previous Course</button>
   <button>Next Course</button>
 </div>
 
-<!-- <lessons-list></lessons-list> -->
-<table class="lessons-list">
-  <tbody>
-    <!-- within table, create new row for each lesson within this course -->
-    <tr>
-      <td class="course-icon"><img></td>
-      <td class="lesson-title"></td>
-      <td class="duration"></td>
-    </tr>
-  </tbody>
-</table>
+<lessons-list [lessons]="lessons$ | async"></lessons-list>
 
 <div class="tools-bar">
   <button>New Lesson</button>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Lesson } from '../shared/model/lesson';
+import { Course } from '../shared/model/course';
 import { CoursesService } from '../shared/model/courses.service';
 import { Observable } from 'rxjs/Rx';
 import { ActivatedRoute } from '@angular/router';
@@ -12,13 +13,15 @@ import { ActivatedRoute } from '@angular/router';
 export class CourseDetailComponent implements OnInit {
 
   lessons$: Observable<Lesson[]>;
+  course$ : Observable<Course>;
 
   constructor(private route: ActivatedRoute, private coursesService:CoursesService) { }
 
   ngOnInit() {
     // need to pass in the course id from URL
     const courseUrl = this.route.snapshot.params['id'];
-    this.coursesService.findLessonsForCourse(courseUrl);
+    this.course$ = this.coursesService.findCourseByUrl(courseUrl);
+    this.lessons$ = this.coursesService.findLessonsForCourse(courseUrl);
   }
 
 }
