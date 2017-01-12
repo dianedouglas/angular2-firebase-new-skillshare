@@ -11,4 +11,8 @@ export class CoursesService {
   findAllCourses(): Observable<Course[]> {
     return this.af.database.list('courses').map(Course.fromJsonList);
   }
+
+  findLessonsForCourse(courseUrl: string){
+    console.log(courseUrl);
+  }
 }

@@ -573,4 +573,24 @@ don't forget square brackets in this case around routerLink.
 This navigates to the relative url of the current page which would be /courses.
 this would go to courses/whatever-is-in-that-url-property
 
-26.
+26. Setting Up the Detail Screen of a Master Detail Setup
+what links lessons to courses is the lessonsPerCourse node.
+  courses
+  lessons
+  lessonsPerCourse
+    courseId
+      lessonId1 = true
+      lessonId2 = true
+      lessonId3 = true
+      lessonId4 = true
+set to true because we only need the key.
+_______
+in courses detail component:
+create property to hold the lessons in current course:
+lessons$: Observable<Lesson[]>;
+
+Then inject the courses service in the constructor
+and in ngOnInit call the service's 'findLessonsForCourse' method we're about to make.
+
+Now we need to have the id of the course whose lessons we're interested in from the url.
+To do that we must inject the 'activated route' Injectable provided by the router.
