@@ -21,7 +21,9 @@ export class CourseDetailComponent implements OnInit {
     // need to pass in the course id from URL
     const courseUrl = this.route.snapshot.params['id'];
     this.course$ = this.coursesService.findCourseByUrl(courseUrl);
+    // this.lessons$ = this.coursesService.loadFirstLessonsPage(courseUrl, 3);
     this.lessons$ = this.coursesService.findLessonsForCourse(courseUrl);
+
   }
 
 }

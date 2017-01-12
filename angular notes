@@ -601,7 +601,95 @@ Pass it in the id of the course we're interested in, or the URL.
 query courses node based on the url property. find match, retrieve course.
 Then we're going to use the course $key property in the lessonsPerCourse.
 Find course and retrieve its list of lessons.
-Then with each lesson key we're going to query the lessons node and get the lesson  properties.
+Then with each lesson key we're going to query the lessons node and get the lesson properties.
 
+in courses service:
 inject AngularFireDatabase directly in courses service.
 constructor(private db: AngularFireDatabase) { }
+then add two methods. One is findCourseByUrl using query.
+
+findCourseByUrl(courseUrl: string): Observable<Course> {
+  return this.db.list('courses', {
+    query: {
+      orderByChild: 'url',
+      equalTo: courseUrl
+      // courseUrl is passed in here from our 'id' parameter in course-detail.
+    }
+  }).map(results => results[0]);
+}
+
+Then we add the second method to find the lessons for that course:
+
+findLessonsForCourse(courseUrl: string): Observable<Lesson[]>{
+
+  // get course observable we have navigated to by url.
+  const course$ = this.findCourseByUrl(courseUrl);
+
+  // go to the lessonsPerCourse table(node)
+  // inside of there, find the course table by $key output lessons.
+  // get back gross firebase object observable array.
+  const lessonsPerCourse$ = course$
+    .switchMap(course => this.db.list('lessonsPerCourse/' + course.$key))
+    .do(console.log);
+
+    // talking to the reference we got back from lessonsPerCourse above
+    // for each firebaseObjectObservable in that array we call db.object to get back the observable for the lesson from the lessons table
+    // this is at the address lessons/lessonkey
+    // THEN we call flatmap on that and somehow that gives us an array of useable lesson objects.
+  return lessonsPerCourse$
+    .map(lessonsPerCourseParameter => lessonsPerCourseParameter.map(lesson => this.db.object('lessons/' + lesson.$key)) )
+    .flatMap(fbojs => Observable.combineLatest(fbojs) )
+    .do(console.log);
+}
+
+
+________
+
+28.  Displaying the Lessons Per Course in the Course Detail Page
+
+in course-detail.ts:
+we are now talking to the service to call both findCourseByUrl to display the name of the course and findLessonsForCourse to display the lessons.
+we store the return value from each of those in an observable property which we can display in the template.
+
+lessons$: Observable<Lesson[]>;
+course$ : Observable<Course>;
+
+constructor(private route: ActivatedRoute, private coursesService:CoursesService) { }
+
+ngOnInit() {
+  // need to pass in the course id from URL
+  const courseUrl = this.route.snapshot.params['id'];
+  this.course$ = this.coursesService.findCourseByUrl(courseUrl);
+  this.lessons$ = this.coursesService.findLessonsForCourse(courseUrl);
+}
+________
+In the template we just have to remember to use the async pipe.
+You can pass these observables into child components if you like or loop through them.
+Just have to remember that for displaying specific properties you have to use the elvis ? operator.
+
+
+// one property of an observable
+<h2>{{ (course$ | async)?.description }}</h2>
+
+// a list of observables being passed into a child component
+<lessons-list [lessons]="lessons$ | async"></lessons-list>
+// then in the child component lessons is treated normally because async already used.
+<li *ngFor="let lesson of lessons">{{lesson.description}}</li>
+
+_______
+29.How To Do Pagination in Firebase ? Loading the First Page of a Paginated Table
+query parameters:
+you could 'startAt' a certain lesson, orderByValue, and 'limitToFirst' 10 results.
+or reverse: 'endAt' element to end at the query and 'limitTo' last for only the last 10 results.
+
+first page of 3 elements
+emit startAt property limiToFirst 3.
+make new method to call from course-detail in service:
+
+loadFirstLessonsPage(courseUrl: string, pageSize): Observable<Lesson[]> {
+
+}
+
+call from course-detail:
+// get 3 results.
+this.lessons$ = this.coursesService.loadFirstLessonsPage(courseUrl, 3);

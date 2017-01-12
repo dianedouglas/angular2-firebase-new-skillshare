@@ -3,6 +3,7 @@ import {AngularFire, AngularFireDatabase} from 'angularfire2';
 import {Observable} from 'rxjs/Rx';
 import {Course} from './course';
 import {Lesson} from './lesson';
+import {FirebaseListFactoryOpts} from "angularfire2/interfaces";
 
 @Injectable()
 export class CoursesService {
@@ -24,25 +25,29 @@ export class CoursesService {
   }
 
   findLessonsForCourse(courseUrl: string): Observable<Lesson[]>{
-    console.log(courseUrl);
-    // get course observable we have navigated to by url.
-    const course$ = this.findCourseByUrl(courseUrl);
+    return this.findLessonsForLessonKeys(this.findLessonKeysPerCourseUrl(courseUrl));
+  }
 
-    // go to the lessonsPerCourse table(node)
-    // inside of there, find the course table by $key output lessons.
-    // get back gross firebase object observable array.
-    const lessonsPerCourse$ = course$
+  loadFirstLessonsPage(courseUrl: string, pageSize: number): Observable<Lesson[]> {
+    const firstPageLessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl,
+    {
+      query : {
+        limitToFirst: pageSize
+      }
+    });
+    return Observable.of([]);
+  }
+
+  findLessonKeysPerCourseUrl(courseUrl: string, query: FirebaseListFactoryOpts = {}): Observable<string[]> {
+    return this.findCourseByUrl(courseUrl)
       .switchMap(course => this.db.list('lessonsPerCourse/' + course.$key))
-      .do(console.log);
+      .map(lspc => lspc.map(lpc => lpc.$key));
+  }
 
-      // talking to the reference we got back from lessonsPerCourse above
-      // for each firebaseObjectObservable in that array we call db.object to get back the observable for the lesson from the lessons table
-      // this is at the address lessons/lessonkey
-      // THEN we call flatmap on that and somehow that gives us an array of useable lesson objects.
-    return lessonsPerCourse$
-      .map(lessonsPerCourseParameter => lessonsPerCourseParameter.map(lesson => this.db.object('lessons/' + lesson.$key)) )
-      .flatMap(fbojs => Observable.combineLatest(fbojs) )
-      .do(console.log);
+  findLessonsForLessonKeys(lessonKeys$: Observable<string[]>):Observable<Lesson[]> {
+    return lessonKeys$
+      .map(lspc => lspc.map(lessonKey => this.db.object('lessons/' + lessonKey)))
+      .flatMap(fbojs => Observable.combineLatest(fbojs))
   }
 
 }
