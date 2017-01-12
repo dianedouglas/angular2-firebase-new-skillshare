@@ -590,7 +590,18 @@ create property to hold the lessons in current course:
 lessons$: Observable<Lesson[]>;
 
 Then inject the courses service in the constructor
-and in ngOnInit call the service's 'findLessonsForCourse' method we're about to make.
+also inject the the 'activated route' Injectable provided by the router.
+The activated route Injectable lets us get parameters out of the url.
 
-Now we need to have the id of the course whose lessons we're interested in from the url.
-To do that we must inject the 'activated route' Injectable provided by the router.
+and in ngOnInit call the service's 'findLessonsForCourse' method we're about to make.
+Pass it in the id of the course we're interested in, or the URL.
+
+27. How To Make a Join in Firebase Using AngularFire 2 ? Reading a Course based on its url
+
+query courses node based on the url property. find match, retrieve course.
+Then we're going to use the course $key property in the lessonsPerCourse.
+Find course and retrieve its list of lessons.
+Then with each lesson key we're going to query the lessons node and get the lesson  properties.
+
+inject AngularFireDatabase directly in courses service.
+constructor(private db: AngularFireDatabase) { }
