@@ -956,3 +956,37 @@ export const routerConfig : Route[] = [
   }
 ];
 
+Next, we need to be able to click on a lesson to navigate to the new route. So, starting from the course-detail component, let's declare a custom event emitter on the lessons list component. It will emit on the 'lesson' output triggering a method in course-detail called navigateToLesson and pass in the lesson object we clicked on. 
+
+<lessons-list [lessons]="lessons" (lesson)="navigateToLesson($event)"></lessons-list>
+
+Then, navigateToLesson will do the navigating.
+
+
+  navigateToLesson(lesson:Lesson) {
+    this.router.navigate(['lessons', lesson.url]);
+  }
+
+It needs the Router object, so we import and inject it:
+
+import { ActivatedRoute, Router } from '@angular/router';
+constructor(private router: Router, private route: ActivatedRoute, private coursesService:CoursesService) { }
+
+Now in lessons-list we need the click handler to trigger the event emitter when we click on a lesson and pass in that lesson. so in lessons-list.component.html:
+
+<li *ngFor="let lesson of lessons" (click)="selectLessonDetail(lesson)">{{lesson.description}}</li>
+
+Then, in its component ts half:
+
+import EventEmitter and Output, then define the event emitter:
+
+  @Output('lesson')
+  lessonEmitter = new EventEmitter<Lesson>();
+
+  selectLessonDetail(lesson:Lesson) {
+    this.lessonEmitter.emit(lesson);
+  }
+
+Now when we click on a lesson, we go to lessons/its-url in our browser.
+
+Again, just like courses, the lesson url has to be unique.

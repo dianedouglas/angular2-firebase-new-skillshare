@@ -3,7 +3,7 @@ import { Lesson } from '../shared/model/lesson';
 import { Course } from '../shared/model/course';
 import { CoursesService } from '../shared/model/courses.service';
 import { Observable } from 'rxjs/Rx';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-course-detail',
@@ -16,7 +16,7 @@ export class CourseDetailComponent implements OnInit {
   course$ : Observable<Course>;
   lessons: Lesson[]; //we use this to get the last lesson's key from this page to use for next method
   courseUrl: string;
-  constructor(private route: ActivatedRoute, private coursesService:CoursesService) { }
+  constructor(private router: Router, private route: ActivatedRoute, private coursesService:CoursesService) { }
 
   ngOnInit() {
     // need to pass in the course id from URL
@@ -46,6 +46,10 @@ export class CourseDetailComponent implements OnInit {
     
     this.coursesService.loadNextPage(this.courseUrl, keyOfLastLessonOnPage, 3)
       .subscribe(lessons => this.lessons = lessons);
+  }
+
+  navigateToLesson(lesson:Lesson) {
+    this.router.navigate(['lessons', lesson.url]);
   }
 
 }

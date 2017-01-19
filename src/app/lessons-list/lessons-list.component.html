@@ -1,1 +1,1 @@
-<li *ngFor="let lesson of lessons">{{lesson.description}}</li>
+<li *ngFor="let lesson of lessons" (click)="selectLessonDetail(lesson)">{{lesson.description}}</li>
