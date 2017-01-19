@@ -1,6 +1,6 @@
 <h2>{{ (course$ | async)?.description }}</h2>
 <div class="nav-bar">
-  <button>Previous Course</button>
+  <button (click)="prev()">Previous Course</button>
   <button (click)="next()">Next Course</button>
 </div>
 

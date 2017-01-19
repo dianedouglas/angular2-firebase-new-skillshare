@@ -32,7 +32,12 @@ export class CourseDetailComponent implements OnInit {
   }
 
   prev() {
-
+    // get key of first lesson in array to pass in because this is what we will limit our results to. 
+    // use 'endAt' this key and 'limitToLast' = 3 in query (in service) 
+    // means start with this lesson key and count backwards to get 3 results. 
+    // subscribe to output and store in same this.lessons property we've been using in template.
+    this.coursesService.loadPrevPage(this.courseUrl, this.lessons[0].$key, 3)
+      .subscribe(lessons => this.lessons = lessons);
   }
 
   next() {

@@ -75,4 +75,17 @@ export class CoursesService {
       .map(lessons => lessons.slice(1, lessons.length));
   }
 
+  loadPrevPage(courseUrl:string, lessonKey:string, pageSize:number): Observable<Lesson[]> {
+    const lessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl, 
+    {
+      query : { //same as loadNextPage but we want the final 4 results, not first 4, limited to current page's first lesson.
+        orderByKey: true,
+        endAt: lessonKey,
+        limitToLast: pageSize + 1
+      }
+    });
+    return this.findLessonsForLessonKeys(lessonKeys$)
+      .map(lessons => lessons.slice(0, lessons.length - 1)); //then we get use slice to keep the whole array but the last element.
+  }
+
 }

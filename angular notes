@@ -883,3 +883,23 @@ in course-detail:
 
   NOW YOU CAN SEE 3 RESULTS AT A TIME WOOOOOOO!!!!
   _____________________ 
+  PREVIOUS PAGE
+
+  In service:
+
+    loadPrevPage(courseUrl:string, lessonKey:string, pageSize:number): Observable<Lesson[]> {
+    const lessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl, 
+    {
+      query : { //same as loadNextPage but we want the final 4 results, not first 4, limited to current page's first lesson. so change startAt to endAt and limitToFirst to limitToLast.
+        orderByKey: true,
+        endAt: lessonKey,
+        limitToLast: pageSize + 1
+      }
+    });
+    return this.findLessonsForLessonKeys(lessonKeys$)
+      .map(lessons => lessons.slice(0, lessons.length - 1)); //then we use slice to keep the whole array but the last element.
+  }
+
+  In course-detail HTML hook up button to prev() method. we're still going to use the lessons property to hold our current 3 results.
+
+  <button (click)="prev()">Previous Course</button>
