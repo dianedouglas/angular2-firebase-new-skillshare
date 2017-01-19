@@ -62,16 +62,17 @@ export class CoursesService {
     return this.findLessonsForLessonKeys(firstPageLessonKeys$);
   }
 
-  // loadNextPage(courseUrl:string, lessonKey:string, pageSize:number): Observable<Lesson[]> {
-  //   const lessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl, {
-  //     query : {
-  //       orderByKey: true,
-  //       startAt: lessonKey,
-  //       limitToFirst: pageSize + 1
-  //     }
-  //   });
-  //   return this.findLessonsForLessonKeys(lessonKeys$)
-  //     .map(lessons => lessons.slice(1, lessons.length));
-  // }
+  loadNextPage(courseUrl:string, lessonKey:string, pageSize:number): Observable<Lesson[]> {
+    const lessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl, 
+    {
+      query : {
+        orderByKey: true,
+        startAt: lessonKey,
+        limitToFirst: pageSize + 1
+      }
+    });
+    return this.findLessonsForLessonKeys(lessonKeys$)
+      .map(lessons => lessons.slice(1, lessons.length));
+  }
 
 }

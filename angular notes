@@ -823,3 +823,63 @@ Then this function uses the output of the previous function to translate into le
 At this point we should be able to see the first 3 lessons of each course.
 _______________
 Then we need to get the next page...
+
+in course-detail:
+
+ // subscribe to observable to store it in property as not an observable so you  don't need to use async pipe to display.
+ lessons: Lesson[]; //we use this to get the last lesson's key from this page to use for next method -not observable
+
+ lessonsObservable$: Observable<Lesson[]>; // this used to be called currentLessons$. Changed its name since it's not going to be used in the template anymore to show the current lessons. 
+ course$ : Observable<Course>;
+ courseUrl: string;
+ constructor(private route: ActivatedRoute, private coursesService:CoursesService) { }
+
+ ngOnInit() {
+   // need to pass in the course id from URL
+   this.courseUrl = this.route.snapshot.params['id'];
+   this.course$ = this.coursesService.findCourseByUrl(this.courseUrl);
+   this.lessonsObservable$ = this.coursesService.loadFirstLessonsPage(this.courseUrl, 3);
+   this.lessonsObservable$.subscribe(lessons => this.lessons = lessons); // subscribe to observable to store it in property as regular fuckin array of objects !!!!!!
+   console.log(this.lessons);
+   // need access to the last element of the lessons array to get its key. 
+   // so we subscribe to observable retrieve lessons and store them in the lessons variable as not an observable.
+   // also need to store course url as property to use it in multiple methods.
+
+ }
+
+
+ next() {
+   var lengthOfLessons = this.lessons.length;
+   var keyOfLastLessonOnPage = this.lessons[lengthOfLessons - 1].$key;
+   
+   this.coursesService.loadNextPage(this.courseUrl, keyOfLastLessonOnPage, 3)
+     .subscribe(lessons => this.lessons = lessons);
+ }
+
+ Now in the HTML we can change currentLessons$ observable with async to normal lessons property:
+
+ <lessons-list [lessons]="lessons"></lessons-list>
+
+
+ Then in service:
+
+  loadNextPage(courseUrl:string, lessonKey:string, pageSize:number): Observable<Lesson[]> {
+    // get lesson keys for this course but with query object for next 3 results
+    const lessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl, 
+    {
+      query : {
+        orderByKey: true,
+        startAt: lessonKey, // start at current lessonkey
+        limitToFirst: pageSize + 1 //get 4, leave out the current one.
+      }
+    }); //translate to lesson observable objects
+    return this.findLessonsForLessonKeys(lessonKeys$)
+      .map(lessons => lessons.slice(1, lessons.length)); //here is where we remove the current lesson 
+  }
+
+  Also, don't forget to hook up the button :)
+
+  <button (click)="next()">Next Course</button>
+
+  NOW YOU CAN SEE 3 RESULTS AT A TIME WOOOOOOO!!!!
+  _____________________ 

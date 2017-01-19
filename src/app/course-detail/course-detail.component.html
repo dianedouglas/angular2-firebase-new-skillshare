@@ -1,10 +1,10 @@
 <h2>{{ (course$ | async)?.description }}</h2>
 <div class="nav-bar">
   <button>Previous Course</button>
-  <button>Next Course</button>
+  <button (click)="next()">Next Course</button>
 </div>
 
-<lessons-list [lessons]="currentLessons$ | async"></lessons-list>
+<lessons-list [lessons]="lessons"></lessons-list>
 
 <div class="tools-bar">
   <button>New Lesson</button>
