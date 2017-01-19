@@ -883,6 +883,7 @@ in course-detail:
 
   NOW YOU CAN SEE 3 RESULTS AT A TIME WOOOOOOO!!!!
   _____________________ 
+  31.  Firebase Pagination Concluded - Loading the Previous Page
   PREVIOUS PAGE
 
   In service:
@@ -903,3 +904,55 @@ in course-detail:
   In course-detail HTML hook up button to prev() method. we're still going to use the lessons property to hold our current 3 results.
 
   <button (click)="prev()">Previous Course</button>
+
+  then implement:
+
+    prev() {
+    // get key of first lesson in array to pass in because this is what we will limit our results to. 
+    // use 'endAt' this key and 'limitToLast' = 3 in query (in service) 
+    // means start with this lesson key and count backwards to get 3 results. 
+    // subscribe to output and store in same this.lessons property we've been using in template.
+    this.coursesService.loadPrevPage(this.courseUrl, this.lessons[0].$key, 3)
+      .subscribe(lessons => this.lessons = lessons);
+  }
+
+  ____________
+32. Navigate From Course Detail to Lesson Detail
+
+ng g component lesson-detail
+restart server
+configure router. At top level, incude id parametr to hold the lesson's url parameter. 
+
+export const routerConfig : Route[] = [
+  {
+    path: 'home',
+    component: HomeComponent
+  },
+  {
+    path: 'courses',
+    children: [
+      {
+        path: ':id',
+        component: CourseDetailComponent
+      },
+      {
+        path: '',
+        component: CoursesComponent
+      }
+    ]
+  },
+  {
+    path: 'lessons/:id',
+    component: LessonDetailComponent
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'home'
+  }
+];
+
