@@ -12,7 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class CourseDetailComponent implements OnInit {
 
-  lessons$: Observable<Lesson[]>;
+  currentLessons$: Observable<Lesson[]>;
   course$ : Observable<Course>;
 
   constructor(private route: ActivatedRoute, private coursesService:CoursesService) { }
@@ -21,8 +21,8 @@ export class CourseDetailComponent implements OnInit {
     // need to pass in the course id from URL
     const courseUrl = this.route.snapshot.params['id'];
     this.course$ = this.coursesService.findCourseByUrl(courseUrl);
-    // this.lessons$ = this.coursesService.loadFirstLessonsPage(courseUrl, 3);
-    this.lessons$ = this.coursesService.findLessonsForCourse(courseUrl);
+    this.currentLessons$ = this.coursesService.loadFirstLessonsPage(courseUrl, 3);
+    // this.lessons$ = this.coursesService.findLessonsForCourse(courseUrl);
 
   }
 

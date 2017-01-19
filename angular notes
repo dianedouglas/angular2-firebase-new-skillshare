@@ -746,4 +746,80 @@ typings install
 
 ONWARD>>>>>>>
 
+______________________
 
+30. PART 1 of Firebase Pagination Continued - Loading the Next Page
+
+Here I fixed the rest of the first part of pagination. At this point we are seeing the first 3 results of lessons in a given course. Here are the ingredients:
+________________________________THE HTML
+In course-detail.html
+
+<lessons-list [lessons]="currentLessons$ | async"></lessons-list>
+
+Here we are passing in the currentLessons$ property to the lessons-list component using the async pipe. lessons-list is a normal component that doesn't have anything to do with observables or the database.
+
+
+  @Input()
+  lessons: Lesson[];
+
+We also have access to the current course's properties in course-detail:
+
+<h2>{{ (course$ | async)?.description }}</h2>
+________________________________NEXT: The typescript talking to the service
+
+Inside of course-detail in ngOnInit we need to call the service to fill the currentLessons$ property.
+
+
+  currentLessons$: Observable<Lesson[]>; //displayed in html passed into lessons-list
+  course$ : Observable<Course>; 
+
+  constructor(private route: ActivatedRoute, private coursesService:CoursesService) { }
+
+  ngOnInit() {
+    //get the course's url property from id parameter in this url. this is confusingly stored in 'id'
+    const courseUrl = this.route.snapshot.params['id']; 
+    //first find the course to display its description.
+    this.course$ = this.coursesService.findCourseByUrl(courseUrl); // pass in 
+    //load the first 3 lessons for this course. 
+    this.currentLessons$ = this.coursesService.loadFirstLessonsPage(courseUrl, 3);
+
+  }
+
+_________________________________NEXT IN THE SERVICE
+
+loadFirstLessonsPage(courseUrl: string, pageSize: number): Observable<Lesson[]> {
+  // receive course url we want and the number of lessons we want from that course.
+  // call findLessonKeysPerCourseUrl by passing in the courseUrl and the query object.
+  const firstPageLessonKeys$ = this.findLessonKeysPerCourseUrl(courseUrl,
+    {
+      query: {
+        orderByKey: true,
+        limitToFirst: pageSize
+      }
+    })
+  .do(console.log); //print
+  //finally, translate the returned lesson keys from above into lesson object observables.
+  return this.findLessonsForLessonKeys(firstPageLessonKeys$);
+}
+
+The two utility functions used by the one above are:
+
+findLessonKeysPerCourseUrl(courseUrl: string, query: FirebaseListFactoryOpts = {}): Observable<string[]> {
+  // return the lesson keys that belong to an individual course including a query object optionally
+  // find the course and then do a list call to the join table with the query object spit out an array of keys.
+  return this.findCourseByUrl(courseUrl)
+    .switchMap(course => this.db.list('lessonsPerCourse/' + course.$key, query))
+    .map(lspc => lspc.map(lpc => lpc.$key));
+}
+
+
+Then this function uses the output of the previous function to translate into lesson objects from array of keys (observable strings)
+  findLessonsForLessonKeys(lessonKeys$: Observable<string[]>):Observable<Lesson[]> {
+    return lessonKeys$
+      .map(lspc => lspc.map(lessonKey => this.db.object('lessons/' + lessonKey)))
+      .flatMap(fbojs => Observable.combineLatest(fbojs))
+  }
+
+At this point we should be able to see the first 3 lessons of each course.
+_______________
+Then we need to get the next page...
