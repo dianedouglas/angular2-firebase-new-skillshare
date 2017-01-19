@@ -693,3 +693,57 @@ loadFirstLessonsPage(courseUrl: string, pageSize): Observable<Lesson[]> {
 call from course-detail:
 // get 3 results.
 this.lessons$ = this.coursesService.loadFirstLessonsPage(courseUrl, 3);
+_______
+SHORT BREAK FROM VIDEOS HERE BECAUSE NOTHING WOULD COMPILE ON MY COMPUTER.
+For reference for later here's what I did.
+
+I got this error that was preventing shit from running.
+https://stackoverflow.com/questions/41285889/ctorparameters-map-is-not-a-function-in-angular2-mdl
+
+tried to fix it as described above by updating the angular cli to "angular-cli": "1.0.0-beta.24", as described but didn't work/didn't fix it all the way - gave me different errors. so tried this: https://github.com/angular/angular-cli/issues/2835
+  1.  delete node_modules
+  2.  do a fresh npm i angular-cli@1.0.0-beta.18 -g
+  3.  do again ng init
+  4.  Y --> override package.json
+
+this seems to have also given me that angular cli beta.24 version plus other stuff. 
+
+then, I got rid of the 'can't find angularfire' etc errors created because I overwrote package.json by installing angularfire2 and firebase from install intructions on angularfire:
+npm install firebase angularfire2 --save
+
+then new errors. https://github.com/angular/angular-cli/issues/3665
+change versions for all angular packages in package.json to one version 2.3.1
+Lock your @angular packages to "2.3.1"
+delete node modules, run npm install again.
+
+
+got this error: https://github.com/angular/angular-cli/issues/3799
+tried to change compiler-cli to 2.4.1 as per instructions but didn't do anything and app was running succesfully with this error anyway so i committed.
+
+FINALLY getting rid of last error: 
+also from here: https://github.com/angular/angular-cli/issues/3799
+ran "ng init", say Y for overwriting everything except app.component. 
+I assume this is different from the "npm i" I did earlier. 
+
+then delete node modules
+npm install
+npm install firebase angularfire2 --save
+ng serve
+
+This worked without errors. Somewhere in there I had to change the statement where we import our model to not use .ts at the end because apparently that's important now:
+
+import { Course } from '../shared/model/course';
+
+instead of:
+
+import { Course } from '../shared/model/course.ts';
+
+finally made sure i could still build:
+reclone 
+git checkout tutorial-dev
+npm install
+typings install
+
+ONWARD>>>>>>>
+
+
