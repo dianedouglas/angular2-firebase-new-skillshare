@@ -1192,3 +1192,26 @@ import {NewLessonComponent} from './new-lesson/new-lesson.component';
 then in course-detail we can add:
 <button routerLink="new">New Lesson</button>
 
+new lesson component needs to know which course we're adding to. add this as an optional parameter.
+we use query parameters to add it after 'new' so w get 'course/id/new?courseid'
+
+here we actually want the course id. 
+
+<button routerLink="new" [queryParams]="{courseId: (course$ | async)?.$key}">New Lesson</button>
+
+we pass an object to queryParams directive
+object creates courseId key that we store stuff in in the url.
+Then since course is an observable, we pass it through the async pipe and the elvis operator to get the key out.
+
+Now in the new lesson component, we need to get that url parameter back out:
+
+import the ActivatedRoute and LessonsService and inject into constructor
+
+then in ngOnInit we can extract it and assign it to a variable:
+
+  courseId: string;
+
+  ngOnInit() {
+    this.courseId = this.route.snapshot.queryParams['courseId'];
+    console.log("course", this.courseId);
+  }

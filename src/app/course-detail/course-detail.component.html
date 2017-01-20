@@ -7,5 +7,5 @@
 <lessons-list [lessons]="lessons" (lesson)="navigateToLesson($event)"></lessons-list>
 
 <div class="tools-bar">
-  <button routerLink="new">New Lesson</button>
+  <button routerLink="new" [queryParams]="{courseId: (course$ | async)?.$key}">New Lesson</button>
 </div>
