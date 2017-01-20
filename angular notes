@@ -1215,3 +1215,64 @@ then in ngOnInit we can extract it and assign it to a variable:
     this.courseId = this.route.snapshot.queryParams['courseId'];
     console.log("course", this.courseId);
   }
+
+  At this point you can navigate to the new lesson component for a course and see the course id printed out.
+
+  _______________
+  38. Creating the Lesson Form Component - Used both for Edit and for Creation
+
+inside of the new lesson component we add 
+<lesson-form></lesson-form>
+<button>Save New Lesson</button>
+
+Then create form fields in lesson form component. 
+
+This format, with a div with label, input, error message for each field.
+
+<form [formGroup]="form" autocomplete="off" novalidate>
+  <fieldset>
+    <legend>Lesson</legend>
+    <div class="form-field">
+      <label>Description</label>
+      <input name="title">
+      <div class="field-error-message">Field is mandatory</div>
+    </div>
+  </fieldset>
+</form>
+
+now in lesson-form component half, import FormGroup, Validators and FormBuilder from '@angular/forms'.
+inject FormBuilder. create property called 'form' of type FormGroup. 
+the property "form" goes with [formGroup]="form" directive in form tag to bind the form html to the form property in the component half.
+
+then we initialize the form. add these directives to each field input tag:
+formControlName="description"
+formControlName="url"
+formControlName="videoUrl"
+formControlName="tags"
+formControlName="longDescription"
+
+then matching in ngOnInit:
+
+  ngOnInit() {
+    this.form = this.fb.group({
+      description: ['placeholder', Validators.required],
+      url: ['', Validators.required],
+      videoUrl: ['', Validators.required],
+      tags: ['', Validators.required],
+      longDescription: ['']
+    });
+  }
+
+  I guess name="title" in each form input doesn't matter? they are all title in his case.
+
+Then the error messages with validation:
+
+  Then we add *ngIf="isErrorVisible('description', 'required')" to each div with an error message and declare the function in the component:
+
+
+  isErrorVisible(field: string, error:string) {
+    return this.form.controls[field].dirty //has been touched
+      && this.form.controls[field].errors //if form is associated with the field
+      && this.form.controls[field].errors[error]; //if the error includes the given error.
+  }
+
