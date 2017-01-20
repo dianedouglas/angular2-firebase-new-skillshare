@@ -2,3 +2,9 @@
   Lesson Details:
   {{currentLesson?.description}}
 </p>
+
+
+<iframe *ngIf="currentLesson?.videoUrl"
+        width="260" height="150" frameborder="0" allowfullscreen
+        [src]="currentLesson?.videoUrl | safeUrl">
+</iframe>

@@ -1046,3 +1046,27 @@ We'll want to add ".indexOn": "url" at /lessons to  security rules to get rid of
 ________
 
 34. Angular 2 Security - Adding an iframe to an Angular 2 Template 
+
+Not very relevant to us. 
+We can generate a pipe with: 
+ng g pipe shared/security/safe-url
+(remember to make the directory src/app/shared/security first)
+
+then we load an iframe like this:
+
+<iframe *ngIf="currentLesson?.videoUrl"
+        width="260" height="150" frameborder="0" allowfullscreen
+        [src]="currentLesson?.videoUrl | safeUrl">
+</iframe>
+
+If we tried to do this without the pipe, we would be trying to use an iframe with data fetched from our backend and this would cause an "unsafe value used in resource url" error because of cross site scripting attacks XSS. That data could be intercepted and we might not show the content we want to.
+
+so we protect by implementing the pipe to mark that content safe:
+
+import { DomSanitizer } from '@angular/platform-browser';
+
+constructor(private sanitizer: DomSanitizer){}
+
+  transform(url): any {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
