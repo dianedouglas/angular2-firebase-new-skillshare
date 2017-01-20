@@ -16,4 +16,13 @@ export class LessonsService {
       .map(lessonsAsJson => Lesson.fromJsonList(lessonsAsJson));
 
   }
+
+  findLessonByUrl(url:string):Observable<Lesson> {
+    return this.af.database.list('lessons', {
+      query: { //use orderByChild if you want to sort by a model property.
+        orderByChild: 'url',
+        equalTo: url
+      }
+    }).map(results => results[0]); // get the first one that matches.
+  }
 }

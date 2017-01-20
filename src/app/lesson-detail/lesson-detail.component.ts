@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Lesson } from '../shared/model/lesson';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LessonsService } from '../shared/model/lessons.service';
 
 @Component({
   selector: 'app-lesson-detail',
@@ -7,9 +10,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LessonDetailComponent implements OnInit {
 
-  constructor() { }
+  currentLesson: Lesson;
+
+  constructor(private route:ActivatedRoute, private lessonsService:LessonsService) { }
 
   ngOnInit() {
+    const lessonUrl = this.route.snapshot.params['id'];
+    const lesson$ = this.lessonsService.findLessonByUrl(lessonUrl);
+    lesson$.subscribe(lesson => this.currentLesson = lesson);
   }
 
 }

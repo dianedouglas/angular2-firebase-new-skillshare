@@ -990,3 +990,59 @@ import EventEmitter and Output, then define the event emitter:
 Now when we click on a lesson, we go to lessons/its-url in our browser.
 
 Again, just like courses, the lesson url has to be unique.
+
+__________________________
+33.  Building a Lesson Detail Component
+
+First, we need the activated route injected and to get the id (lesson url) out of the browser url.
+
+Also need to inject lessonsService in constructor
+
+Then we're going to make and call a method on it called findLessonByUrl.
+____
+constructor(private route:ActivatedRoute, private lessonsService:LessonsService) { }
+
+ngOnInit() {
+  const lessonUrl = this.route.snapshot.params['id'];
+  const lesson$ = this.lessonsService.findLessonByUrl(lessonUrl);
+}
+____
+Then we call subscribe to assign the returned observable to a property to display in the template:
+
+  currentLesson: Lesson;
+
+  constructor(private route:ActivatedRoute, private lessonsService:LessonsService) { }
+
+  ngOnInit() {
+    const lessonUrl = this.route.snapshot.params['id'];
+    const lesson$ = this.lessonsService.findLessonByUrl(lessonUrl);
+    lesson$.subscribe(lesson => this.currentLesson = lesson);
+  }
+
+_____
+in the service, we simply query by url:
+
+findLessonByUrl(url:string):Observable<Lesson> {
+  return this.af.database.list('lessons', {
+    query: { //use orderByChild if you want to sort by a model property.
+      orderByChild: 'url',
+      equalTo: url
+    }
+  }).map(results => results[0]); // get the first one that matches.
+}
+
+_____
+Finally, in the template we just have to remember to use the elvis operator, or I assume async if this were an array.
+
+<p>
+  Lesson Details:
+  {{currentLesson?.description}}
+</p>
+
+_____
+
+We'll want to add ".indexOn": "url" at /lessons to  security rules to get rid of a warning like we did with /courses.
+
+________
+
+34. Angular 2 Security - Adding an iframe to an Angular 2 Template 
