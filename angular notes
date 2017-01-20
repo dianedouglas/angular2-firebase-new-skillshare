@@ -1070,3 +1070,65 @@ constructor(private sanitizer: DomSanitizer){}
   transform(url): any {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
+  __________
+
+  35-36. Navigating From Lesson To Lesson - Part 1 and 2
+he says we need to install these packages but I didn't and they worked anyway.
+
+npm install lodash --save
+npm install @types/lodash --save
+
+in the lesson-detail component we need a next/prev button methods.
+
+<button (click)="previous()">Prev Lesson</button>
+<button (click)="next()">Next Lesson</button>
+
+Then, we create the two methods in lesson-detail:
+
+next() {
+  this.lessonsService.loadNextLesson(this.currentLesson.courseId, this.currentLesson.$key)
+    .subscribe(
+      lesson => this.router.navigate(['lessons', lesson.url])
+    );
+}
+
+previous() {
+  this.lessonsService.loadPreviousLesson(this.currentLesson.courseId, this.currentLesson.$key)
+    .subscribe(
+      lesson => this.router.navigate(['lessons', lesson.url])
+    );
+}
+
+we are passing in the current lesson's course id and its $key. then lessons service returns an observable we subscribe to in order to use it with router's navigate method. go to lessons/lesson.url
+
+make sure to import and inject the router:
+
+import { ActivatedRoute, Router } from '@angular/router';
+constructor(private router:Router, private route:ActivatedRoute, private lessonsService:LessonsService) { } 
+
+But this doesn't work and gives no errors!
+
+if loading stuff doesn't work and there are no errors, it is probably the router not taking you somewhere. remember you need to not use ngOnInit if you are navigating between the same componnt because ngOnInit is only called once. so can't use snapshot within. 
+
+must refactor the ngOnInit:
+
+
+ngOnInit() {
+  // const lessonUrl = this.route.snapshot.params['id']; //for using this component more than once, prev/next lesson, 
+  // snapshot doesn't work within ngOnInit - only called once when component loaded the first time.
+  // const lesson$ = this.lessonsService.findLessonByUrl(lessonUrl);
+  var lesson$ = this.route.params.switchMap(params => {
+    const lessonUrl = params['id'];
+    return this.lessonsService.findLessonByUrl(lessonUrl);
+  });
+  lesson$.subscribe(lesson => this.currentLesson = lesson);
+}
+
+This is giving me a 'supplied paramters don't match any signature of call target' error for this line:
+const lessonUrl = params['id'];
+but everything works so whatever. error is only in text editor.
+
+__________
+37.  The Create New Lesson Form
+

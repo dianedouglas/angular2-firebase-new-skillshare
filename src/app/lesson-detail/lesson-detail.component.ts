@@ -12,12 +12,31 @@ export class LessonDetailComponent implements OnInit {
 
   currentLesson: Lesson;
 
-  constructor(private route:ActivatedRoute, private lessonsService:LessonsService) { }
+  constructor(private router:Router, private route:ActivatedRoute, private lessonsService:LessonsService) { }
 
   ngOnInit() {
-    const lessonUrl = this.route.snapshot.params['id'];
-    const lesson$ = this.lessonsService.findLessonByUrl(lessonUrl);
+    // const lessonUrl = this.route.snapshot.params['id']; //for using this component more than once, prev/next lesson, 
+    // snapshot doesn't work within ngOnInit - only called once when component loaded the first time.
+    // const lesson$ = this.lessonsService.findLessonByUrl(lessonUrl);
+    var lesson$ = this.route.params.switchMap(params => {
+      const lessonUrl = params['id'];
+      return this.lessonsService.findLessonByUrl(lessonUrl);
+    });
     lesson$.subscribe(lesson => this.currentLesson = lesson);
+  }
+
+  next() {
+    this.lessonsService.loadNextLesson(this.currentLesson.courseId, this.currentLesson.$key)
+      .subscribe(
+        lesson => this.router.navigate(['lessons', lesson.url])
+      );
+  }
+
+  previous() {
+    this.lessonsService.loadPreviousLesson(this.currentLesson.courseId, this.currentLesson.$key)
+      .subscribe(
+        lesson => this.router.navigate(['lessons', lesson.url])
+      );
   }
 
 }
