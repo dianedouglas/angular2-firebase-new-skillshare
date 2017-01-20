@@ -1132,3 +1132,63 @@ but everything works so whatever. error is only in text editor.
 __________
 37.  The Create New Lesson Form
 
+import reactive forms in app.module
+
+import { ReactiveFormsModule } from '@angular/forms';
+then include in the imports array. 
+
+ng g component new-lesson
+
+form and save button should be in separate component to be used for edit too
+
+ng g component lesson-form
+
+configure router:
+
+button to go to new lesson form in course detail component so we can attach it to a course
+
+instead of this:
+{
+  path: 'courses',
+  children: [
+    {
+      path: ':id',
+      component: CourseDetailComponent
+    },
+    {
+      path: '',
+      component: CoursesComponent
+    }
+  ]
+},
+
+  we want
+
+import {NewLessonComponent} from './new-lesson/new-lesson.component';
+
+{
+  path: 'courses',
+  children: [
+    {
+      path: ':id',
+      children: [
+        {
+          path: '', //show same lessons per course if we are at blank child path
+          component: CourseDetailComponent // we were loading this at courses/:id. now it's courses/:id/''
+        },
+        {
+          path: 'new', //if we are at courses/url/new we are adding a new lesson to a course
+          component: NewLessonComponent
+        }
+      ]
+    },
+    {
+      path: '',
+      component: CoursesComponent
+    }
+  ]
+},
+
+then in course-detail we can add:
+<button routerLink="new">New Lesson</button>
+

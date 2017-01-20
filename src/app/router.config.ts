@@ -4,6 +4,7 @@ import {HomeComponent} from './home/home.component';
 import {CoursesComponent} from './courses/courses.component';
 import {CourseDetailComponent} from './course-detail/course-detail.component';
 import {LessonDetailComponent} from './lesson-detail/lesson-detail.component';
+import {NewLessonComponent} from './new-lesson/new-lesson.component';
 
 export const routerConfig : Route[] = [
   {
@@ -15,7 +16,16 @@ export const routerConfig : Route[] = [
     children: [
       {
         path: ':id',
-        component: CourseDetailComponent
+        children: [
+          {
+            path: '', //show same lessons per course if we are at blank child path
+            component: CourseDetailComponent
+          },
+          {
+            path: 'new', //if we are at courses/url/new we are adding a new lesson to a course
+            component: NewLessonComponent
+          }
+        ]
       },
       {
         path: '',
