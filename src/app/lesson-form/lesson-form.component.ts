@@ -27,4 +27,13 @@ export class LessonFormComponent implements OnInit {
       && this.form.controls[field].errors[error]; //if the error includes the given error.
   }
 
+  get value() {
+    return this.form.value;
+  }
+
+  reset() {
+    this.form.reset();
+  }
+
+
 }

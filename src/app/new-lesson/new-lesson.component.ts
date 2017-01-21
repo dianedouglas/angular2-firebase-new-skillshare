@@ -18,4 +18,17 @@ export class NewLessonComponent implements OnInit {
     console.log("course", this.courseId);
   }
 
+  save(lessonData) {
+    console.log('lessondata in save' + lessonData);
+    this.lessonsService.createNewLesson(this.courseId, lessonData)
+      .subscribe(
+        () => {
+          alert('lesson saved');
+        },
+        err => {
+          alert('error:' + err);
+        }
+      );
+  }
+
 }

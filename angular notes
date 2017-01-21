@@ -1275,4 +1275,87 @@ Then the error messages with validation:
       && this.form.controls[field].errors //if form is associated with the field
       && this.form.controls[field].errors[error]; //if the error includes the given error.
   }
+______________
 
+39. Lessons Service - Add Save New Lesson Functionality THIS VIDEO IS COMPLETELY WRONG AND TALKS ABOUT UPDATE.
+
+in the new-lesson component we create a local variable 'form' and when we click the save button we trigger the save method and pass in the form's value with all the user data in it.
+
+<lesson-form #form></lesson-form>
+<button (click)="save(form.value)">Save New Lesson</button>
+
+To make that form.value method work we need to add this method to this method to lesson-form.component:
+
+
+  get value() {
+    return this.form.value;
+  }
+
+
+Also add this to clear the form after submitting:
+
+
+  reset() {
+    this.form.reset();
+  }
+
+We can trigger this from the button in new-lesson component:
+
+<button (click)="save(form.value); form.reset();">Save New Lesson</button>
+
+Now we need the save method in the new-lesson component:
+
+
+  save(lessonData) {
+    console.log('lessondata in save' + lessonData);
+    this.lessonsService.createNewLesson(this.courseId, lessonData)
+      .subscribe(
+        () => {
+          alert('lesson saved');
+        },
+        err => {
+          alert('error:' + err);
+        }
+      );
+  }
+
+Then we create the createNewLesson method in the lessonsService, and another method that it calls to update the database.
+
+createNewLesson(courseId:string, lessonData:any):Observable<any> {
+  const lessonToSave = Object.assign({}, lessonData, { courseId });
+  const newLessonKey = this.dbRef.child('lessons').push().key;
+  let dataToSave = {};
+  dataToSave["lessons/" + newLessonKey] = lessonToSave;
+  dataToSave["lessonsPerCourse/" + courseId + "/" + newLessonKey] = true;
+  return this.firebaseUpdate(dataToSave);
+
+}
+
+firebaseUpdate(dataToSave) {
+  const subject = new Subject();
+  this.dbRef.update(dataToSave)
+    .then(
+        val => {
+          subject.next(val);
+          subject.complete();
+        },
+        err => {
+          subject.error(err);
+          subject.complete();
+        }
+      );
+  return subject.asObservable();
+}
+
+To make these work we also need to import a couple things and declare that dbRef variable in the constructor.
+import { Injectable, Inject } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+import { Lesson } from './lesson';
+import { AngularFire, FirebaseRef } from 'angularfire2';
+import { Subject } from "rxjs/Rx";
+
+  dbRef: any;
+
+  constructor(private af: AngularFire, @Inject(FirebaseRef) dbRef) { 
+    this.dbRef = dbRef.database().ref();
+  }

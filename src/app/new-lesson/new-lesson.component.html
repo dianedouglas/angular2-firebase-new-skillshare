@@ -1,2 +1,2 @@
-<lesson-form></lesson-form>
-<button>Save New Lesson</button>
+<lesson-form #form></lesson-form>
+<button (click)="save(form.value); form.reset();">Save New Lesson</button>
