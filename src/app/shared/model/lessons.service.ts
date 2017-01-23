@@ -76,6 +76,18 @@ export class LessonsService {
 
   }
 
+  saveEditedLesson(lessonId:string, lesson):Observable<any>{
+    // put the lesson data into a blank object
+    const lessonToSave = Object.assign({}, lesson);
+    //we don't want the key to be inside of the lessonToSave object because it's part of the url.
+    delete(lessonToSave.$key); 
+    let dataToSave = {};
+    // then we save the lesson data inside of an object with key at lessons/lessonId
+    dataToSave['lessons/' + lessonId] = lessonToSave;
+    // this time we don't need to update the lessonsPerCourse because the association is already there.
+    return this.firebaseUpdate(dataToSave);
+  }
+
   firebaseUpdate(dataToSave) {
     // create rxjs subject so that we can convert it to an observable to return. 
     const subject = new Subject();

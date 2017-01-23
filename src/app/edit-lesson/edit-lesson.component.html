@@ -1,2 +1,2 @@
-<lesson-form [initialValue]="lesson"></lesson-form>
-<button>Save Changes</button>
+<lesson-form [initialValue]="lesson" #form></lesson-form>
+<button (click)="save(form.value)">Save Changes</button>

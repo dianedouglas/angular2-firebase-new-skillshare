@@ -1612,3 +1612,47 @@ export class LessonFormComponent implements OnInit, OnChanges {
   }
 
 Hooray! Now we should be able to hit edit and see the lesson-form component with values from the current lesson.
+__________________________
+
+44. Lessons Service - Add Save New Lesson Functionality
+
+Now we need to be able to send the form values to the database through the lessons service to update the lesson we're editing. Let's connect the form lesson-form component to the edit-lesson component that's loading it. in edit-lesson.html
+
+<lesson-form [initialValue]="lesson" #form></lesson-form>
+<button (click)="save(form.value)">Save Changes</button>
+
+Then in edit-lesson.component.ts we import and inject the lessons service:
+
+import { LessonsService } from "../shared/model/lessons.service";
+  constructor(private route: ActivatedRoute,  private lessonsService:LessonsService) {  
+
+  and declare save method:
+
+  save(lessonData) {
+  // sends lesson key and data from form to service
+    this.lessonsService.saveEditedLesson(this.lesson.$key, lessonData)
+      .subscribe(
+        () => {
+          alert('edited lesson saved');
+        },
+        err => {
+          alert('error saving lesson: ' + err);
+        }
+      )
+  }
+
+then declare the saveEditedLesson method in the service that we call above:
+  save(lessonData) {
+    // added these two lines in myself because these properties are not in our form so they get lost on save.
+    lessonData['courseId'] = this.lesson.courseId;
+    lessonData['duration'] = this.lesson.duration;
+    this.lessonsService.saveEditedLesson(this.lesson.$key, lessonData)
+      .subscribe(
+        () => {
+          alert('edited lesson saved');
+        },
+        err => {
+          alert('error saving lesson: ' + err);
+        }
+      )
+  }
