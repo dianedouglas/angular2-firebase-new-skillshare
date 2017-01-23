@@ -1468,3 +1468,147 @@ import { Component, OnInit, Input } from '@angular/core';
   initialValue: any;
 
 _____________
+
+42. Edit Lesson - Retrieve Lesson using the Router Resolve Functionality
+
+Angular 2 router resolve functionality. how to write resolvers.
+writing a data resolver with observables
+for trying to do a transition between routes.
+
+then in edit lesson component.ts:
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Lesson } from '../shared/model/lesson';
+
+
+@Component({
+  selector: 'app-edit-lesson',
+  templateUrl: './edit-lesson.component.html',
+  styleUrls: ['./edit-lesson.component.css']
+})
+export class EditLessonComponent implements OnInit {
+
+  lesson: Lesson;
+
+  constructor(private route: ActivatedRoute) {  
+    //receives input data for the component before component was created by router.
+    route.data.subscribe(
+      data => this.lesson = data['lesson']
+    )
+  }
+
+  ngOnInit() {
+  }
+
+}
+
+Then connect it up in the router:
+
+
+  {
+    path: 'lessons/:id',
+    children: [
+      {
+        path: '',
+        component: LessonDetailComponent
+      },
+      {
+        path: 'edit',
+        component: EditLessonComponent,
+        resolve: {
+          lesson: LessonResolver
+        }
+      }
+    ]
+  },
+
+This way we can pass in a whole lesson object without a url.
+Finally we need to declare LessonResolver. create shared/model/lesson.resolver.ts:
+
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Lesson } from './lesson';
+import { Observable } from 'rxjs/Rx';
+import { Injectable } from '@angular/core';
+import { LessonsService } from './lessons.service';
+
+
+@Injectable()
+export class LessonResolver implements Resolve<Lesson>{
+
+  constructor(private lessonsService: LessonsService) {
+
+  }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):Observable<any>{
+    return this.lessonsService.findLessonByUrl(route.params['id']);
+  }
+}
+
+
+And we add it to the providers array and import it in the app.module file.
+
+import { LessonResolver } from './shared/model/lesson.resolver';
+
+  providers: [LessonsService, CoursesService, LessonResolver],
+
+And we import it into the router.config file too:
+
+import { LessonResolver } from './shared/model/lesson.resolver';
+
+
+at this point if we hit the edit button nothing happens. no errors no transition to new component. wtf? common problem with observables apparently. have to make sure the observable completes so call 'first' on it in lesson.resolver.ts.
+
+return this.lessonsService.findLessonByUrl(route.params['id']).first();
+
+if we click edit we still can't see anything in the form, but we are navigated correctly to the form.
+
+________________
+43. Edit Lesson - Passing the Retrieved Data to the Lesson Form
+
+In LESSON FORM COMPONENT.
+
+Finally, we have to pass that initial value into the form inside of the lesson-form component to deal with the edit case.
+
+1. import OnChanges and SimpleChanges:
+
+2. then add implements ngOnChanges to class declaration, and add  ngOnChanges method. it will look for any time a new value is passed in for a lesson to edit.
+
+3. Move the ngOnInit stuff to the constructor because we have to make sure we initialize the form before looking for changes in the initial value. Can't load the lesson into the form if the form doesn't exist yet.
+
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { validateUrl } from '../shared/validators/validateUrl';
+
+
+@Component({
+  selector: 'lesson-form',
+  templateUrl: './lesson-form.component.html',
+  styleUrls: ['./lesson-form.component.css']
+})
+export class LessonFormComponent implements OnInit, OnChanges {
+
+  form: FormGroup;
+  @Input()
+  initialValue: any;
+
+  constructor(private fb: FormBuilder) { 
+    // initialize form from constructor so that afterwards we can detect changes in initial value and display lesson values in edit form.
+    this.form = this.fb.group({
+      description: ['placeholder', Validators.required],
+      url: ['', Validators.required],
+      videoUrl: ['', [Validators.required, validateUrl]],
+      tags: ['', Validators.required],
+      longDescription: ['']
+    });
+
+  }
+
+  ngOnChanges(changes:SimpleChanges) {
+    //make sure form is initialized and look for changes to initialValue input property
+    if(this.form && changes['initialValue']) {
+      this.form.patchValue(changes['initialValue'].currentValue)
+    }
+  }
+
+Hooray! Now we should be able to hit edit and see the lesson-form component with values from the current lesson.
