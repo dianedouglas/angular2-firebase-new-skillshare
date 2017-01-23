@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { validateUrl } from '../shared/validators/validateUrl';
 
@@ -11,6 +11,8 @@ import { validateUrl } from '../shared/validators/validateUrl';
 export class LessonFormComponent implements OnInit {
 
   form: FormGroup;
+  @Input()
+  initialValue: any;
 
   constructor(private fb: FormBuilder) { }
 

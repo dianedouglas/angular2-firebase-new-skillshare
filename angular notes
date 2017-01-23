@@ -1411,3 +1411,60 @@ then we can check for the error in the url field the same way as we did with the
 <div *ngIf="isErrorVisible('videoUrl', 'validUrl')" class="field-error-message">Not a valid url</div>
 
 we pass in the string for the field we're validating and the name of the property in our object returned from validateUrl function to the lesson form 'isErrorVisible' method.
+
+______________
+41.  Edit Lesson - Initial Screen Setup
+
+we want to click the edit button to open the same form as the one for saving a new lesson, but instead we want to pass in the properties of the current lesson so we can edit them and resave it. 
+
+ng g component edit-lesson
+
+then create button with routerLink. We want this button to show up on the lesson-details component.
+
+<button routerLink="edit">Edit Lesson</button>
+
+Then we add to the router configuration. Instead of:
+
+
+  {
+    path: 'lessons/:id',
+    component: LessonDetailComponent
+  },
+
+  We want this:
+
+
+  {
+    path: 'lessons/:id',
+    children: [
+      {
+        path: '',
+        component: LessonDetailComponent
+      },
+      {
+        path: 'edit',
+        component: EditLessonComponent
+      }
+    ]
+  },
+
+Also, import the new component:
+
+import {EditLessonComponent} from './edit-lesson/edit-lesson.component';
+
+At this point you should be able to click the edit button to navigate to the new component.
+
+Then in the edit lesson component template we want to load the lesson form and add a save button. we want to pass into the lesson form the initial values of the current lesson. We'll create a property called 'initialValue' inside of the lesson-form component.
+
+<lesson-form [initialValue]="lesson"></lesson-form>
+<button>Save Changes</button>
+
+Then in the lesson-form.component.ts file we need to add:
+
+import { Component, OnInit, Input } from '@angular/core';
+
+
+@Input()
+  initialValue: any;
+
+_____________
