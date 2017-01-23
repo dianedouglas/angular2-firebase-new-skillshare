@@ -1,2 +1,2 @@
 <lesson-form #form></lesson-form>
-<button (click)="save(form.value); form.reset();">Save New Lesson</button>
+<button [disabled]="!form.valid" (click)="save(form)">Save New Lesson</button>

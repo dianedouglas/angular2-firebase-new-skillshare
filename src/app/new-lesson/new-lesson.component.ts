@@ -18,12 +18,12 @@ export class NewLessonComponent implements OnInit {
     console.log("course", this.courseId);
   }
 
-  save(lessonData) {
-    console.log('lessondata in save' + lessonData);
-    this.lessonsService.createNewLesson(this.courseId, lessonData)
-      .subscribe(
+  save(form) {
+    this.lessonsService.createNewLesson(this.courseId, form.value)
+      .subscribe( //returns observable which we subscribe to.
         () => {
           alert('lesson saved');
+          form.reset();
         },
         err => {
           alert('error:' + err);
