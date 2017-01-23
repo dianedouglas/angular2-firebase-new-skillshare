@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { validateUrl } from '../shared/validators/validateUrl';
+
+
 @Component({
   selector: 'lesson-form',
   templateUrl: './lesson-form.component.html',
@@ -15,7 +18,7 @@ export class LessonFormComponent implements OnInit {
     this.form = this.fb.group({
       description: ['placeholder', Validators.required],
       url: ['', Validators.required],
-      videoUrl: ['', Validators.required],
+      videoUrl: ['', [Validators.required, validateUrl]],
       tags: ['', Validators.required],
       longDescription: ['']
     });

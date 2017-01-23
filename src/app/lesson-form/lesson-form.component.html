@@ -15,7 +15,7 @@
       <label>Video Url:</label>
       <input name="title" formControlName="videoUrl">
       <div class="field-error-message" *ngIf="isErrorVisible('videoUrl', 'required')">Field is mandatory</div>
-      <!-- <div class="field-error-message">Not a valid url</div> -->
+      <div *ngIf="isErrorVisible('videoUrl', 'validUrl')" class="field-error-message">Not a valid url</div>
     </div>
     <div class="form-field">
       <label>Tags:</label>

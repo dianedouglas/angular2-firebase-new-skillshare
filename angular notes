@@ -1386,3 +1386,28 @@ And we need to add that .valid method to the lesson-form component.
     return this.form.value;
   }
 
+___________________________
+
+40.  Add New Lesson - Add a Custom Url Field Validator
+
+Create file validateUrl.ts in shared/validators. 
+
+after exporting validator function, include it in the list of validators in lesson-form.component
+
+instead of this:
+
+videoUrl: ['', Validators.required],
+
+We want:
+
+videoUrl: ['', [Validators.required, validateUrl]],
+
+you can include an array of as many validator functions as you need. don't forget to import them in that same component.
+
+import { validateUrl } from '../shared/validators/validateUrl';
+
+then we can check for the error in the url field the same way as we did with the 'required' errors:
+
+<div *ngIf="isErrorVisible('videoUrl', 'validUrl')" class="field-error-message">Not a valid url</div>
+
+we pass in the string for the field we're validating and the name of the property in our object returned from validateUrl function to the lesson form 'isErrorVisible' method.
