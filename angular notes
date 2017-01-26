@@ -1656,3 +1656,59 @@ then declare the saveEditedLesson method in the service that we call above:
         }
       )
   }
+
+  _________________
+
+45.  Setup Firebase Authentication, Create a Login Page
+
+ng g component login
+ng g component register
+
+then in router:
+
+{
+  path: 'login',
+  component: LoginComponent
+},
+{
+  path: 'register',
+  component: RegisterComponent
+}
+
+then add links in top-menu
+
+<a routerLink="login">Login</a>
+<a routerLink="register">Register</a>
+<a>Logout</a>
+
+Only want to show login and register if not logged in, and only show logout if you are logged in.
+
+ng g service shared/security/auth
+
+add service to app.module providers
+
+then login component.html
+
+<form novalidate [formGroup]="form">
+
+  <fieldset>
+    <legend>Login</legend>
+    <div class="form-field">
+      <label>Email:</label>
+      <input name="email" formControlName="email">
+    </div>
+     <div class="form-field">
+      <label>Password:</label>
+      <input name="password" formControlName="password" type="password">
+    </div>
+  </fieldset>
+
+  <button (click)="login()">Login</button>
+</form>
+
+then login component.ts
+
+add form property, inject formbuilder in constrructor and init with validators
+
+
+
