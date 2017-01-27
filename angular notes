@@ -2011,3 +2011,27 @@ Then we add the signup method to the auth service. Exactly the same as the login
     // call the createUser method on angularfire's firebaseauth module, returns promise, convert to observable.
     return this.fromFirebaseAuthPromise(this.auth.createUser({ email: email, password: password }));
   }
+
+  _________________________
+
+  48. Setup the Logout Functionality
+
+  First add a click handler to call a logout method in the top-menu component from logout link:
+
+  <a (click)="logout()" *ngIf="authInfo?.isLoggedIn()">Logout</a>
+
+  Then implement that method in the component to simply call the auth service method of same name. Keep all the auth stuff together in service so that components are transparent and don't need to know about angularfire.
+
+    // keep this separate from this particular component by putting logout in service.
+  logout() {
+    this.authService.logout();
+  }
+
+
+  Then in the auth service:
+
+    logout() {
+    this.auth.logout();
+    //emit a new value to all components that user is no longer authenticated.
+    this.authInfo$.next(AuthService.UNKNOWN_USER);
+  }

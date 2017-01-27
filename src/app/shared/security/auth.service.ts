@@ -45,4 +45,10 @@ export class AuthService {
     );
     return subject.asObservable();
   }
+
+  logout() {
+    this.auth.logout();
+    //emit a new value to all components that user is no longer authenticated.
+    this.authInfo$.next(AuthService.UNKNOWN_USER);
+  }
 }

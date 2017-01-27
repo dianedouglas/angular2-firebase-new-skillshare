@@ -7,4 +7,4 @@
   >Courses</a>
   <a routerLink="login" *ngIf="!authInfo?.isLoggedIn()">Login</a>
   <a routerLink="register" *ngIf="!authInfo?.isLoggedIn()">Register</a>
-  <a *ngIf="authInfo?.isLoggedIn()">Logout</a>
+  <a (click)="logout()" *ngIf="authInfo?.isLoggedIn()">Logout</a>
