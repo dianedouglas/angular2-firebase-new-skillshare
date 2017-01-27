@@ -1927,3 +1927,87 @@ constructor(public auth: FirebaseAuth,
 
 It's working for now, try this later.
   __________________
+
+47. Build a User Registration Page
+
+First we need a form. Almost the same as login form. disable button if passwords don't match, and apparently there are some builtin rules to firebase password auth because mine had to be at least 6 characters long.
+
+register.component.html
+
+  <form novalidate [formGroup]="form">
+
+  <fieldset>
+    <legend>Register</legend>
+    <div class="form-field">
+      <label>Email:</label>
+      <input name="email" formControlName="email">
+    </div>
+     <div class="form-field">
+      <label>Password:</label>
+      <input name="password" formControlName="password" type="password">
+    </div>
+     <div class="form-field">
+      <label>Confirm Password:</label>
+      <input name="confirm" formControlName="confirm" type="password">
+    </div>
+  </fieldset>
+  <!-- disable register button if passwords do not match -->
+  <button (click)="register()" [disabled]="!isPasswordMatch()">Register</button>
+</form>
+
+then we initialize the form, add the register method and the isPasswordMatch method to the register.component.ts file (no need for ngOnInit):
+
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {AuthService} from "../shared/security/auth.service";
+import {Router } from '@angular/router';
+
+
+@Component({
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
+})
+export class RegisterComponent {
+
+  form: FormGroup;
+
+  constructor(private fb: FormBuilder, 
+              private authService: AuthService,
+              private router: Router) { 
+
+    this.form = this.fb.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required],
+      confirm: ['', Validators.required]
+    });
+
+  }
+
+  isPasswordMatch() {
+    const formData = this.form.value;
+    // return true only if the form data and the password field are not blank
+    // and if the password field is equal to the confirm field  
+    return formData && formData.password && formData.password == formData.confirm; 
+  }
+
+  register() {
+    const formData = this.form.value;
+    this.authService.signUp(formData.email, formData.password)
+      .subscribe(
+        () => {
+          alert('user created!'); //confirm message and then to /home.
+          this.router.navigateByUrl('/home');
+        },
+        err => alert(err) //otherwise show error.
+      );
+  }
+
+}
+
+Then we add the signup method to the auth service. Exactly the same as the login method except that we call the angularfire 'createUser' method instead of 'login' method:
+
+  signUp(email, password):Observable<any>{
+    // call the createUser method on angularfire's firebaseauth module, returns promise, convert to observable.
+    return this.fromFirebaseAuthPromise(this.auth.createUser({ email: email, password: password }));
+  }

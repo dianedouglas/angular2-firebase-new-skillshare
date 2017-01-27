@@ -19,6 +19,10 @@ export class AuthService {
     // call the login method on angularfire's firebaseauth module, returns promise, convert to observable.
     return this.fromFirebaseAuthPromise(this.auth.login({ email: email, password: password }));
   }
+  signUp(email, password):Observable<any>{
+    // call the createUser method on angularfire's firebaseauth module, returns promise, convert to observable.
+    return this.fromFirebaseAuthPromise(this.auth.createUser({ email: email, password: password }));
+  }
 
   //method to convert a promise into an observable to return above.
   fromFirebaseAuthPromise(promise):Observable<any> {
