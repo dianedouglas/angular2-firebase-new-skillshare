@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { firebaseConfig } from "../environments/firebase.config";
+import { authConfig } from "../environments/firebase.config";
 import { AngularFireModule } from "angularfire2/index";
 import { HomeComponent } from './home/home.component';
 import {LessonsService} from "./shared/model/lessons.service";
@@ -46,7 +47,7 @@ import { RegisterComponent } from './register/register.component';
   ],
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireModule.initializeApp(firebaseConfig, authConfig),
     FormsModule,
     HttpModule,
     ReactiveFormsModule,

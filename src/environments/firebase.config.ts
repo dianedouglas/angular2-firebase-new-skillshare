@@ -1,3 +1,4 @@
+import { AuthMethods, AuthProviders } from 'angularfire2/index';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAwuKl7qjXwEFV4e_XdCLY8goNChIMgc1w",
@@ -6,3 +7,8 @@ export const firebaseConfig = {
   storageBucket: "tutorial-b967f.appspot.com",
   messagingSenderId: "979501840072"
 };
+
+export const authConfig = {
+  provider: AuthProviders.Password,
+  method: AuthMethods.Password
+}

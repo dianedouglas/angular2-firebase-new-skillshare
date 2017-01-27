@@ -1706,9 +1706,96 @@ then login component.html
   <button (click)="login()">Login</button>
 </form>
 
-then login component.ts
+then login component.ts:
 
-add form property, inject formbuilder in constrructor and init with validators
+add form property, inject formbuilder in constructor and init with validators
+
+  form: FormGroup;
+
+  constructor(private fb:FormBuilder, private authService:AuthService,
+    private router:Router) { 
+    this.form = this.fb.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required],
+    });
+  }
+
+Then in firebase main menu > auth > set up signin email/password
+add an admin user to test in interface
+inject and import the auth service and Router in login component
+declare login method to go with button
+
+also import and inject auth service then make login function
+
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {AuthService} from "../shared/security/auth.service";
+import {Router } from '@angular/router';
 
 
+  login(){
+    //get form values, pass to login method in auth service we're about to make
+    const formValue = this.form.value;
+    this.authService.login(formValue.email, formValue.password)
+      .subscribe( //navigate home on successful login, if error, call alert.
+        ()=>this.router.navigate(['/home']),
+        alert
+      );
+  }
 
+
+in auth service:
+
+import { Injectable } from '@angular/core';
+import { AngularFireAuth } from 'angularfire2/index';
+import { Observable, Subject } from 'rxjs/Rx';
+
+@Injectable()
+export class AuthService {
+
+  constructor(private auth: AngularFireAuth) { }
+
+  login(email, password):Observable<any>{
+    // call the login method on angularfire's firebaseauth module, returns promise, convert to observable.
+    return this.fromFirebaseAuthPromise(this.auth.login({ email: email, password: password }));
+  }
+
+  //method to convert a promise into an observable to return above.
+  fromFirebaseAuthPromise(promise):Observable<any> {
+    const subject = new Subject<any>();
+    promise.then(
+      res => {
+        subject.next(res);
+        subject.complete();
+      },
+      err => {
+        subject.error(err);
+        subject.complete();
+      }
+    );
+    return subject.asObservable();
+  }
+}
+
+
+Then we have to specify which login methods are available in our environments/firebase.config.ts file. this grabs what we have turned on in the firebase console.
+
+import { AuthMethods, AuthProviders } from 'angularfire2/index';
+
+export const firebaseConfig = {
+  apiKey: "AIzaSyAwuKl7qjXwEFV4e_XdCLY8goNChIMgc1w",
+  authDomain: "tutorial-b967f.firebaseapp.com",
+  databaseURL: "https://tutorial-b967f.firebaseio.com",
+  storageBucket: "tutorial-b967f.appspot.com",
+  messagingSenderId: "979501840072"
+};
+
+export const authConfig = {
+  provider: AuthProviders.Password,
+  method: AuthMethods.Password
+}
+
+then pass it in app.module:
+
+import { authConfig } from "../environments/firebase.config";
+AngularFireModule.initializeApp(firebaseConfig, authConfig),
+  ____________________
