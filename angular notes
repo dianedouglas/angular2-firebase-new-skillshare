@@ -1897,4 +1897,33 @@ Finally, we can use this observable property in the template to only show the lo
   <a routerLink="register" *ngIf="!authInfo?.isLoggedIn()">Register</a>
   <a *ngIf="authInfo?.isLoggedIn()">Logout</a>
 
+Just a note: 
+https://angular-university.io/lesson/angular2-firebase-authentication-observable-data-service
+
+I'm getting this warning:
+
+WARNING: the getAuth() API has changed behavior since adding support for Firebase 3.
+This will return null for the initial value when the page loads, even if the user is actually logged in.
+Please observe the actual authState asynchronously by subscribing to the auth service: af.auth.subscribe().
+The getAuth method will be removed in future releases
+
+Someone did refactor but I haven't tried this yet. in the auth service:
+
+constructor(public auth: FirebaseAuth,
+                public af: AngularFire) {
+
+        this.af.auth.subscribe(auth => {
+            if (auth) {
+                const authInfo = new AuthInfo(auth.uid);
+                this.authInfo$.next(authInfo);
+            }
+            else {
+                this.authInfo$.next(AuthService.UNKNOWN_USER);
+            }
+        });
+    }
+
+    https://disq.us/url?url=https%3A%2F%2Fgist.github.com%2Fkimonio%2Fba1846c6c243f3aeaead3c38ca6df7b5%3AtHozDhlm9ZMAm0lX5bBpQHDyoR4&cuid=4188724
+
+It's working for now, try this later.
   __________________
