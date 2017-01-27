@@ -5,6 +5,6 @@
   <a  routerLinkActive="bob"
       routerLink="courses"
   >Courses</a>
-  <a routerLink="login">Login</a>
-  <a routerLink="register">Register</a>
-  <a>Logout</a>
+  <a routerLink="login" *ngIf="!authInfo?.isLoggedIn()">Login</a>
+  <a routerLink="register" *ngIf="!authInfo?.isLoggedIn()">Register</a>
+  <a *ngIf="authInfo?.isLoggedIn()">Logout</a>
