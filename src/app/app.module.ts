@@ -9,6 +9,7 @@ import { AngularFireModule } from "angularfire2/index";
 import { HomeComponent } from './home/home.component';
 import {LessonsService} from "./shared/model/lessons.service";
 import {AuthService} from "./shared/security/auth.service";
+import {AuthGuard} from "./shared/security/auth.guard";
 import {Lesson} from './shared/model/lesson';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
@@ -53,7 +54,7 @@ import { RegisterComponent } from './register/register.component';
     ReactiveFormsModule,
     RouterModule.forRoot(routerConfig)
   ],
-  providers: [LessonsService, CoursesService, LessonResolver, AuthService],
+  providers: [LessonsService, CoursesService, LessonResolver, AuthService, AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

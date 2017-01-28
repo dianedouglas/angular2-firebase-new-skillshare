@@ -2035,3 +2035,68 @@ Then we add the signup method to the auth service. Exactly the same as the login
     //emit a new value to all components that user is no longer authenticated.
     this.authInfo$.next(AuthService.UNKNOWN_USER);
   }
+
+  _____________
+
+  We should only be able to see a lesson if we're logged in. 
+  In security folder create auth.guard.ts
+It's just a class but it's going to implement an interface called "CanActivate"
+
+import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '@angular/router';
+import {Observable} from 'rxjs/Rx';
+import {Injectable} from '@angular/core';
+import {AuthService} from'./auth.service';
+
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  
+  constructor(private authService:AuthService, private router:Router ) {
+  }
+
+  canActivate(route:ActivatedRouteSnapshot,
+              state:RouterStateSnapshot):Observable<boolean> {
+    // authservice gives us authinfo$ observable. 
+    // this gives as value an object of authInfo which has bool isLoggedIn
+    // take(1) is a way of making the observable 'complete' like a promise.
+    return this.authService.authInfo$
+        .map(authInfo => authInfo.isLoggedIn())
+        .take(1)
+        .do(allowed => {
+            //if not allowed, redirect to login.
+            if(!allowed) {
+                this.router.navigate(['/login']);
+            }
+        });
+  }
+}
+
+then add AuthGuard to providers array in app.module:
+
+import {AuthGuard} from "./shared/security/auth.guard";
+
+providers: [LessonsService, CoursesService, LessonResolver, AuthService, AuthGuard],
+
+Then, you can use it by adding a property to any of your router config objects to protect it from unauthenticated users and redirect them to login:
+
+first import again:
+import {AuthGuard} from'./shared/security/auth.guard';
+
+then this lets you only be able to view lessons if you are logged in. 
+  {
+    path: 'lessons/:id',
+    children: [
+      {
+        path: '',
+        component: LessonDetailComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'edit',
+        component: EditLessonComponent,
+        canActivate: [AuthGuard],
+        resolve: {
+          lesson: LessonResolver
+        },
+      }
+    ]
