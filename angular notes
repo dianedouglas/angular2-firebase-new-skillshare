@@ -2038,6 +2038,8 @@ Then we add the signup method to the auth service. Exactly the same as the login
 
   _____________
 
+49. Redirect User To Login Page Using a Router Guard
+
   We should only be able to see a lesson if we're logged in. 
   In security folder create auth.guard.ts
 It's just a class but it's going to implement an interface called "CanActivate"
@@ -2100,3 +2102,91 @@ then this lets you only be able to view lessons if you are logged in.
         },
       }
     ]
+  }
+
+_________________________________
+
+50. REST and Firebase - Using the Firebase REST API
+
+we can also talk to the database with its built in rest api. responds to get, patch, put, delete 
+
+We will use this for delete.
+
+import HttpModule to app.module and include it in the imports array:
+  
+  import { HttpModule } from '@angular/http';
+
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp(firebaseConfig, authConfig),
+    FormsModule,
+    HttpModule,
+    ReactiveFormsModule,
+    RouterModule.forRoot(routerConfig)
+  ],
+
+add click handler to delete method on delete button in the lesson detail component.
+
+  <button (click)="delete()">Delete Lesson</button>
+
+  delete() {
+    this.lessonsService.deleteLesson(this.currentLesson.$key);
+  }
+
+then implement in service:
+
+import { Http } from '@angular/http';
+import { firebaseConfig } from "../../../environments/firebase.config";
+
+
+constructor(private af: AngularFire, @Inject(FirebaseRef) fb, private http:Http) { 
+  this.sdkDb = fb.database().ref();
+}
+
+  deleteLesson(lessonId:string):Observable<any> {
+    const url = firebaseConfig.databaseURL + '/lessons/' + lessonId + '.json';
+    return this.http.delete(url);
+  }
+
+  Works, and is pretty good, but doesn't delete the relationship in lessonsPerCourse.
+
+  So I added a second method called from the delete button!
+
+  from the lesson detail component html:
+
+  <button (click)="delete(); deleteLessonPerCourse();">Delete Lesson</button>
+
+  triggers the lesson detail component.ts:
+
+
+  delete() {
+    this.lessonsService.deleteLesson(this.currentLesson.$key)
+      .subscribe(
+          () => {
+            alert('yo i am deleted son!');
+          },
+          console.error
+        );
+  }
+  deleteLessonPerCourse() {
+    this.lessonsService.deleteLessonPerCourse(this.currentLesson.$key, this.currentLesson.courseId)
+      .subscribe(
+          () => {
+            alert('yo i am deleted son!');
+            this.router.navigate(['/home']);
+          },
+          console.error
+        );
+  }
+
+  which triggers both methods in the service. WOOOO!
+
+  deleteLesson(lessonId: string):Observable<any> {
+    const url = firebaseConfig.databaseURL + '/lessons/' + lessonId + '.json';
+    return this.http.delete(url);
+  }
+
+  deleteLessonPerCourse(lessonId: string, courseId:string):Observable<any> {
+    const urlLessonsPerCourse = firebaseConfig.databaseURL + '/lessonsPerCourse/' + courseId + '/' + lessonId + '.json';
+    return this.http.delete(urlLessonsPerCourse);
+  }

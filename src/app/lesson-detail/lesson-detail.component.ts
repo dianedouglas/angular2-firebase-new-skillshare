@@ -39,4 +39,24 @@ export class LessonDetailComponent implements OnInit {
       );
   }
 
+  delete() {
+    this.lessonsService.deleteLesson(this.currentLesson.$key)
+      .subscribe(
+          () => {
+            alert('yo i am deleted son!');
+          },
+          console.error
+        );
+  }
+  deleteLessonPerCourse() {
+    this.lessonsService.deleteLessonPerCourse(this.currentLesson.$key, this.currentLesson.courseId)
+      .subscribe(
+          () => {
+            alert('yo i am deleted son!');
+            this.router.navigate(['/home']);
+          },
+          console.error
+        );
+  }
+
 }

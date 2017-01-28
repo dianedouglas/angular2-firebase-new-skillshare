@@ -3,13 +3,15 @@ import { Observable } from 'rxjs/Rx';
 import { Lesson } from './lesson';
 import { AngularFire, FirebaseRef } from 'angularfire2';
 import { Subject } from "rxjs/Rx";
+import { Http } from '@angular/http';
+import { firebaseConfig } from "../../../environments/firebase.config";
 
 @Injectable()
 export class LessonsService {
 
   sdkDb: any;
 
-  constructor(private af: AngularFire, @Inject(FirebaseRef) fb) { 
+  constructor(private af: AngularFire, @Inject(FirebaseRef) fb, private http:Http) { 
     this.sdkDb = fb.database().ref();
   }
 
@@ -103,5 +105,15 @@ export class LessonsService {
           }
         );
     return subject.asObservable();
+  }
+
+  deleteLesson(lessonId: string):Observable<any> {
+    const url = firebaseConfig.databaseURL + '/lessons/' + lessonId + '.json';
+    return this.http.delete(url);
+  }
+
+  deleteLessonPerCourse(lessonId: string, courseId:string):Observable<any> {
+    const urlLessonsPerCourse = firebaseConfig.databaseURL + '/lessonsPerCourse/' + courseId + '/' + lessonId + '.json';
+    return this.http.delete(urlLessonsPerCourse);
   }
 }
