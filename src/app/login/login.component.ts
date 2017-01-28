@@ -24,14 +24,18 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  login(){
+  signin(){
     //get form values, pass to login method in auth service we're about to make
-    const formValue = this.form.value;
-    this.authService.login(formValue.email, formValue.password)
+
+    this.authService.login(this.form.value.email, this.form.value.password)
       .subscribe( //navigate home on successful login, if error, call alert.
-        ()=>this.router.navigate(['/home']),
-        alert
-      );
+        ()=>{
+          this.router.navigate(['/home']);
+        },
+        ()=>{
+          alert('there was an error');
+        }
+    );
   }
 
 }
