@@ -1,7 +1,7 @@
 <h2>{{ (course$ | async)?.description }}</h2>
 <div class="nav-bar">
-  <button (click)="prev()">Previous Course</button>
-  <button (click)="next()">Next Course</button>
+  <button (click)="prev()">Previous Lessons</button>
+  <button (click)="next()">Next Lessons</button>
 </div>
 
 <lessons-list [lessons]="lessons" (lesson)="navigateToLesson($event)"></lessons-list>

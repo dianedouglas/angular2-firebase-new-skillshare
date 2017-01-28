@@ -2190,3 +2190,37 @@ constructor(private af: AngularFire, @Inject(FirebaseRef) fb, private http:Http)
     const urlLessonsPerCourse = firebaseConfig.databaseURL + '/lessonsPerCourse/' + courseId + '/' + lessonId + '.json';
     return this.http.delete(urlLessonsPerCourse);
   }
+
+
+  ________________________
+
+  51.  Protect Write Access Using Security Rules
+
+  {
+    "rules": {
+      ".read": "true",
+      ".write": "auth != null",
+      "courses": {
+        ".indexOn": ["url"]
+      },
+      "lessons": {
+        ".indexOn": ["url"]
+      },
+      "queue": {
+        "tasks": {
+          ".indexOn": ["_state"]
+        }
+      }
+    }
+  }
+
+  change write to auth != null
+  this is all you have to do to say that only people who are authenticated can write into the database.
+
+  that last one, queue prevents some error in the console. don't know. whatever. he doesn't say.
+
+  _______________________
+
+  52. Build a Custom Node Backend Using Firebase Queue
+
+  Doesn't really matter for us. shows how to run a node batch server so that you can delete lessons and lessonspercourse at the same time. More useful for queueing long tasks with a bunch of data. 
